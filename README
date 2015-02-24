@@ -1,0 +1,38 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=5120
+
+DESCRIPTION
+Most custom completions are about particular bases, contexts, patterns, or
+buffers, and are pretty fixed about them. But sometimes a special completion
+(for example, only XML tag names) would be very useful, but it would be
+overkill to write a complete custom completion for it (even though the
+CompleteHelper.vim library makes this quite simple).
+This plugin provides a generic, configurable framework for defining custom
+completions through simple configuration objects, allowing both global and
+buffer- or window-scoped completions. So if you e.g. need completion of
+expressions inside <% ... %> for a particular filetype, you can quickly define
+such, and assign it to a completion key.
+
+SOURCE
+Inspired by
+    http://stackoverflow.com/questions/28496473/a-particular-text-tagging-system-in-vim
+
+SEE ALSO
+- Check out the CompleteHelper.vim plugin page (vimscript #3914) for a full
+  list of insert mode completions powered by it.
+
+USAGE
+In insert mode, invoke the alphabetic completion via CTRL-X CTRL-X; you will
+then be prompted for another key that selects the particular completion.
+You can then search forward and backward via CTRL-N / CTRL-P, as usual.
+
+CTRL-X CTRL-X {key}     Find special matches configured for {key} (see
+                        g:SpecialLocationCompletions).
+                        Further use of CTRL-X CTRL-X will copy additional text
+                        (what exactly is customizable, too).
+
+The plugin ships with the following global default completions:
+CTRL-X CTRL-X t         Find pure tag names (without attributes and the
+                        surrounding <...>) in opening and closing tags.
+CTRL-X CTRL-X T         Find complete tags (everything inside and including
+                        the <...>). Further use will copy following complete
+                        tags (without text in between).

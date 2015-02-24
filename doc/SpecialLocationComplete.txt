@@ -1,0 +1,154 @@
+*SpecialLocationComplete.txt*	Insert mode completion for special custom patterns.
+
+		 SPECIAL LOCATION COMPLETE    by Ingo Karkat
+						 *SpecialLocationComplete.vim*
+description			|SpecialLocationComplete-description|
+usage				|SpecialLocationComplete-usage|
+installation			|SpecialLocationComplete-installation|
+configuration			|SpecialLocationComplete-configuration|
+limitations			|SpecialLocationComplete-limitations|
+known problems			|SpecialLocationComplete-known-problems|
+todo				|SpecialLocationComplete-todo|
+history				|SpecialLocationComplete-history|
+
+==============================================================================
+DESCRIPTION				 *SpecialLocationComplete-description*
+
+Most custom completions are about particular bases, contexts, patterns, or
+buffers, and are pretty fixed about them. But sometimes a special completion
+(for example, only XML tag names) would be very useful, but it would be
+overkill to write a complete custom completion for it (even though the
+|CompleteHelper.vim| library makes this quite simple).
+This plugin provides a generic, configurable framework for defining custom
+completions through simple configuration objects, allowing both global and
+buffer- or window-scoped completions. So if you e.g. need completion of
+expressions inside <% ... %> for a particular filetype, you can quickly define
+such, and assign it to a completion key.
+
+SOURCE									     *
+
+Inspired by
+    http://stackoverflow.com/questions/28496473/a-particular-text-tagging-system-in-vim
+
+SEE ALSO								     *
+
+- Check out the |CompleteHelper.vim| plugin page (vimscript #3914) for a full
+  list of insert mode completions powered by it.
+
+==============================================================================
+USAGE					       *SpecialLocationComplete-usage*
+
+In insert mode, invoke the alphabetic completion via CTRL-X CTRL-X; you will
+then be prompted for another key that selects the particular completion.
+You can then search forward and backward via CTRL-N / CTRL-P, as usual.
+							     *i_CTRL-X_CTRL-X*
+CTRL-X CTRL-X {key}	Find special matches configured for {key} (see
+			|g:SpecialLocationCompletions|).
+			Further use of CTRL-X CTRL-X will copy additional text
+			(what exactly is customizable, too).
+
+				 *SpecialLocationComplete-default-completions*
+The plugin ships with the following global default completions:
+CTRL-X CTRL-X t		Find pure tag names (without attributes and the
+			surrounding <...>) in opening and closing tags.
+CTRL-X CTRL-X T		Find complete tags (everything inside and including
+			the <...>). Further use will copy following complete
+			tags (without text in between).
+
+==============================================================================
+INSTALLATION				*SpecialLocationComplete-installation*
+
+This script is packaged as a |vimball|. If you have the "gunzip" decompressor
+in your PATH, simply edit the *.vmb.gz package in Vim; otherwise, decompress
+the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
+vimball or via the |:UseVimball| command. >
+    vim SpecialLocationComplete*.vmb.gz
+    :so %
+To uninstall, use the |:RmVimball| command.
+
+DEPENDENCIES				*SpecialLocationComplete-dependencies*
+
+- Requires Vim 7.0 or higher.
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.010 or
+  higher.
+- Requires the |CompleteHelper.vim| plugin (vimscript #3914), version 1.40 or
+  higher.
+
+==============================================================================
+CONFIGURATION			       *SpecialLocationComplete-configuration*
+
+For a permanent configuration, put the following commands into your |vimrc|:
+						*w:SpecialLocationCompletions*
+						*b:SpecialLocationCompletions*
+						*g:SpecialLocationCompletions*
+This completion can provide an arbitrary number of special completions; these
+can be available globally, or only in particular buffers or windows. Each
+completion is defined by a configuration object under a (correspondingly
+scoped) Dictionary; the key is the single character that must be typed after
+the |i_CTRL-X_CTRL-X| completion mapping. The following example shows the
+defaults (which are modeled after the built-in keyword completion), and
+explains their use: >
+    let g:SpecialLocationCompletions = {
+    \	'k': {
+<	The (single!) key (after |i_CTRL-X_CTRL-X|) to invoke. >
+    \	    'description': 'keywords',
+<		An (optional) explanation appended to the key in the prompt. >
+    \	    'complete': '.,w,b,u'
+<		Specifies what is searched, like the 'complete' option. The
+		default depends on the config variable scope: visible windows
+		for |w:|, the current buffer for |:b|, and everything
+		configured in 'complete' for |g:|. >
+    \       'base': '\k\*\%#',
+<		The pattern to locate the completion base (before the cursor). >
+    \       'patternTemplate': '\<%s\k\+',
+<		With the base inserted at "%s", yields the pattern used to
+		search for completions. >
+    \	    'emptyBasePattern': '',
+<		Optional alternative pattern to 'patternTemplate' that is used
+		when there's no base. >
+    \       'repeatPatternTemplate': '%s\zs\s*\k\+',
+<		When repeating the completion, yields the pattern to search
+		for completions. "%s" is replaced with the full completion,
+		"%S" is replaced with just the last added completion part.
+		Alternatively, common repeat patterns can also be built from
+		the following parts characterized by an anchor, a matching
+		atom, and a non-matching in between (this is the default): >
+    \       'repeatAnchorExpr': '\<',
+    \       'repeatPositiveExpr': '\k',
+    \       'repeatNegativeExpr': '\%(\k\@!\.\)',
+    \	}
+    \}
+In addition, any other a:options from CompleteHelper#FindMatches() can be
+specified, too. These are passed to the CompleteHelper function.
+
+					       *SpecialLocationComplete-remap*
+If you want to use a different mapping, map your keys to the
+<Plug>(SpecialLocationComplete) mapping target _before_ sourcing the script
+(e.g. in your |vimrc|): >
+    imap <C-x><C-x> <Plug>(SpecialLocationComplete)
+<
+==============================================================================
+LIMITATIONS				 *SpecialLocationComplete-limitations*
+
+KNOWN PROBLEMS			      *SpecialLocationComplete-known-problems*
+
+TODO						*SpecialLocationComplete-todo*
+
+IDEAS					       *SpecialLocationComplete-ideas*
+
+==============================================================================
+HISTORY					     *SpecialLocationComplete-history*
+
+1.00	24-Feb-2015
+First published version.
+
+0.01	13-Feb-2015
+Started development.
+
+==============================================================================
+Copyright: (C) 2015 Ingo Karkat
+The VIM LICENSE applies to this plugin; see |copyright|.
+
+Maintainer:	Ingo Karkat <ingo@karkat.de>
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
